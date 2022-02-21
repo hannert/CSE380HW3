@@ -1,12 +1,10 @@
 import AI from "../../Wolfie2D/DataTypes/Interfaces/AI";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
-import Debug from "../../Wolfie2D/Debug/Debug";
 import Emitter from "../../Wolfie2D/Events/Emitter";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import Receiver from "../../Wolfie2D/Events/Receiver";
 import Input from "../../Wolfie2D/Input/Input";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
-import MathUtils from "../../Wolfie2D/Utils/MathUtils";
 import { Homework3Event } from "../HW3_Enums";
 
 export default class CarPlayerController implements AI {
@@ -47,6 +45,8 @@ export default class CarPlayerController implements AI {
 
 		this.receiver = new Receiver();
 		this.emitter = new Emitter();
+
+		this.receiver.subscribe(Homework3Event.PLAYER_DAMAGE);
 	}
 
 	activate(options: Record<string, any>){};
@@ -54,13 +54,16 @@ export default class CarPlayerController implements AI {
 	handleEvent(event: GameEvent): void {
 		// We need to handle animations when we get hurt
 		if(event.type === Homework3Event.PLAYER_DAMAGE){
+			console.log("Player took damage");
 			if(event.data.get("health") === 0){
 				// Play animation and queue event to end game
+				console.log("health = 0");
+
 				this.owner.animation.play("dying", false, Homework3Event.PLAYER_DEAD);
 				this.owner.animation.queue("dead", true);
 				this.isDead = true;
 			} else {
-				this.owner.animation.play("damage", false, Homework3Event.PLAYER_I_FRAMES_END);
+				this.owner.animation.play("takingDamage", false, Homework3Event.PLAYER_I_FRAMES_END);
 			}
 		}
 	}
@@ -79,6 +82,12 @@ export default class CarPlayerController implements AI {
 		//If shift is currently being held down, increase the speed of the car. If not, check if mouse click has been pressed to shoot a bullet.
 		if(Input.isKeyPressed("shift")) {
 			this.speed = this.MAX_SPEED;
+		} 
+		else { 
+			if(Input.isKeyPressed("enter")){
+				this.emitter.fireEvent(Homework3Event.SHOOT_BULLET, {position: this.owner.position.clone()});  
+			}
+
 		}
 
 		// We need to handle player input for movement
@@ -92,8 +101,11 @@ export default class CarPlayerController implements AI {
 		this.owner.position.add(movement.scaled(deltaT));
 
 		// Animations
-		if(!this.owner.animation.isPlaying("damage") && !this.owner.animation.isPlaying("dying") && !this.owner.animation.isPlaying("firing")){
+		if(!this.owner.animation.isPlaying("takingDamage") && !this.owner.animation.isPlaying("dying") && !this.owner.animation.isPlaying("firing")){
 			this.owner.animation.playIfNotAlready("driving");
+		}
+		if(Input.isKeyJustPressed("enter")){
+			this.owner.animation.playIfNotAlready("firingWeapon");
 		}
 	}
 	destroy(): void {

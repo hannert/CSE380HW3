@@ -1,25 +1,21 @@
 import AABB from "../../Wolfie2D/DataTypes/Shapes/AABB";
+import Circle from "../../Wolfie2D/DataTypes/Shapes/Circle";
 import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
-import GameNode from "../../Wolfie2D/Nodes/GameNode";
+import CanvasNode from "../../Wolfie2D/Nodes/CanvasNode";
 import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import { GraphicType } from "../../Wolfie2D/Nodes/Graphics/GraphicTypes";
 import AnimatedSprite from "../../Wolfie2D/Nodes/Sprites/AnimatedSprite";
+import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
 import RandUtils from "../../Wolfie2D/Utils/RandUtils";
-import RockAI from "../AI/RockAI";
 import BulletBehavior from "../AI/BulletAI";
-import { Homework3Animations, Homework3Event, Homework3Shaders } from "../HW3_Enums";
 import CarPlayerController from "../AI/CarPlayerController";
-import Circle from "../../Wolfie2D/DataTypes/Shapes/Circle";
+import RockAI from "../AI/RockAI";
+import { Homework3Event, Homework3Shaders } from "../HW3_Enums";
 import GameOver from "./GameOver";
-import ShaderType from "../../Wolfie2D/Rendering/WebGLRendering/ShaderType";
-import Sprite from "../../Wolfie2D/Nodes/Sprites/Sprite";
-import CanvasNode from "../../Wolfie2D/Nodes/CanvasNode";
-import Shape from "../../Wolfie2D/DataTypes/Shapes/Shape";
-import Timer from "../../Wolfie2D/Timing/Timer";
 
 /**
  * In Wolfie2D, custom scenes extend the original scene class.
@@ -73,6 +69,8 @@ export default class Homework3_Scene extends Scene {
 	/*
 		You'll want to be sure to load in your own sprite here
 	*/
+
+	static workingVec: Vec2 = new Vec2(0,0);
 	/*
 	 * loadScene() overrides the parent class method. It allows us to load in custom assets for
 	 * use in our scene.
@@ -80,7 +78,7 @@ export default class Homework3_Scene extends Scene {
 	loadScene(){
 		/* ##### DO NOT MODIFY ##### */
 		// Load in the player car spritesheet
-		this.load.spritesheet("player", "hw3_assets/spritesheets/cars.json");
+		this.load.spritesheet("player", "hw3_assets/spritesheets/vehicle.json");
 
 		// Load in the background image
 		this.load.image("desert_road", "hw3_assets/sprites/road.jpg");
@@ -480,6 +478,7 @@ export default class Homework3_Scene extends Scene {
 				// If the rock is spawned in and it overlaps the player
 				if(rock.visible && this.player.collisionShape.overlaps(rock.boundary)){
 					// Put your code here:
+					this.emitter.fireEvent(Homework3Event.PLAYER_DAMAGE);
 				}
 			}
 		}
@@ -571,6 +570,19 @@ export default class Homework3_Scene extends Scene {
 	 */
 	handleScreenDespawn(node: CanvasNode, viewportCenter: Vec2, paddedViewportSize: Vec2, isBullet: boolean): void {
 		// Your code goes here:
+		if(isBullet){ // Is a bullet
+			if(node.boundary.bottom  < viewportCenter.y - (paddedViewportSize.y/2) - viewportCenter.y){
+				this.emitter.fireEvent(Homework3Event.BULLET_USED, {id: node.id});
+				console.log("imma let them bullets fly");
+			}
+		}
+		else{ // Is a rock
+			if(node.boundary.top > viewportCenter.y + (paddedViewportSize.y/2)){
+				node.visible = false;
+				console.log("Rock despawned");
+
+			}
+		}
 	}
 
 	// HOMEWORK 3 - TODO (3. BOUND CAR)
@@ -593,12 +605,16 @@ export default class Homework3_Scene extends Scene {
 	 * 
 	 * Note that the player cannot be halfway off the screen either vertically or horizontally, it must always be fully visible
 	 * 								
-	 * @param viewportCenter The center of the viewport
+	 * @param viewportCenter The center of the viewport	
 	 * @param viewportSize The size of the viewport
 	 */
 	lockPlayer(viewportCenter: Vec2, viewportSize: Vec2): void {
 		//REMOVE
 		// Your code goes here:
+		if(this.player.positionY == (viewportCenter.y - viewportSize.y/2) + 1){
+			console.log("hit the top of the screen");
+		}
+
 	}
 
 	// HOMEWORK 3 - TODO (2. collision)
@@ -629,6 +645,14 @@ export default class Homework3_Scene extends Scene {
 	static checkAABBtoCircleCollision(aabb: AABB, circle: Circle): boolean {
 		//REMOVE
 		// Your code goes here:
+		aabb.bottomLeft.x - aabb.bottomRight.x
+		for(let pt = aabb.bottomLeft.x; pt < aabb.bottomRight.x; pt++){
+			this.workingVec.set(pt, aabb.y);
+			if(circle.containsPoint(this.workingVec)){
+				console.log("HIT!");
+				return true;
+			}
+		}
 		return false;
 	}
 
