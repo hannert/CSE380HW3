@@ -54,11 +54,8 @@ export default class CarPlayerController implements AI {
 	handleEvent(event: GameEvent): void {
 		// We need to handle animations when we get hurt
 		if(event.type === Homework3Event.PLAYER_DAMAGE){
-			console.log("Player took damage");
 			if(event.data.get("health") === 0){
 				// Play animation and queue event to end game
-				console.log("health = 0");
-
 				this.owner.animation.play("dying", false, Homework3Event.PLAYER_DEAD);
 				this.owner.animation.queue("dead", true);
 				this.isDead = true;
@@ -85,7 +82,7 @@ export default class CarPlayerController implements AI {
 		} 
 		else { 
 			this.speed = this.MIN_SPEED;
-			if(Input.isKeyPressed("enter")){
+			if(Input.isMouseJustPressed()){
 				this.emitter.fireEvent(Homework3Event.SHOOT_BULLET, {position: this.owner.position.clone()});  
 			}
 

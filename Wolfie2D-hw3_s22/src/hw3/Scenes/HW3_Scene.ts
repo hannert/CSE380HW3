@@ -359,7 +359,6 @@ export default class Homework3_Scene extends Scene {
 			let event = this.receiver.getNextEvent();
 
 			if(event.type === Homework3Event.PLAYER_I_FRAMES_END){
-				console.log("no longer invinci"); 
 				this.playerinvincible = false;
 			}
 
@@ -585,13 +584,11 @@ export default class Homework3_Scene extends Scene {
 		if(isBullet){ // Is a bullet
 			if(node.boundary.bottom  < viewportCenter.y - (paddedViewportSize.y/2)){
 				this.emitter.fireEvent(Homework3Event.BULLET_USED, {id: node.id});
-				console.log("imma let them bullets fly, y: " + (viewportCenter.y - (paddedViewportSize.y/2)));
 			}
 		}
 		else{ // Is a rock- viewportCenter.y
 			if(node.boundary.top > viewportCenter.y + (paddedViewportSize.y/2)){
 				node.visible = false;
-				console.log("Rock despawned");
 
 			}
 		}
@@ -629,21 +626,16 @@ export default class Homework3_Scene extends Scene {
 		// }
 		if(this.player.boundary.center.y - this.player.boundary.getHalfSize().y <= (viewportCenter.y - viewportSize.y/2) + 1){
 			this.player.position.y = (viewportCenter.y - viewportSize.y/2 + 1) + this.player.boundary.getHalfSize().y;
-			console.log("hit the top oxf the screen");
 		}
 		if(this.player.boundary.center.y + this.player.boundary.getHalfSize().y >= (viewportCenter.y + viewportSize.y/2) - 1){
 			this.player.position.y = (viewportCenter.y + viewportSize.y/2 - 1) - this.player.boundary.getHalfSize().y;
-			console.log("hit the bottom of the screen");
 		}
 		if(this.player.boundary.center.x - this.player.boundary.getHalfSize().x <= (viewportCenter.x - viewportSize.x/2) + 1){
 			this.player.position.x = (viewportCenter.x - viewportSize.x/2 + 1) + this.player.boundary.getHalfSize().x;
-			console.log("hit the left of the screen");
 		}
 		if(this.player.boundary.center.x + this.player.boundary.getHalfSize().x >= (viewportCenter.x + viewportSize.x/2) - 1){
 			this.player.position.x = (viewportCenter.x + viewportSize.x/2 - 1) - this.player.boundary.getHalfSize().x;
 			
-			console.log("hit the right of the screen");
-			console.log(this.player.position.x);
 		}	
 	}
 
@@ -679,7 +671,6 @@ export default class Homework3_Scene extends Scene {
 		for(let pt = aabb.bottomLeft.x; pt < aabb.bottomRight.x; pt++){
 			this.workingVec.set(pt, aabb.y);
 			if(circle.containsPoint(this.workingVec)){
-				console.log("HIT!");
 				return true;
 			}
 		}

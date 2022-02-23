@@ -89,16 +89,32 @@
 			"repeat": false,
 			"frames": [
 				{
+					"index": 17,
+					"duration": 8
+				},
+				{
 					"index": 18,
 					"duration": 20
+				},
+				{
+					"index": 17,
+					"duration": 8
 				},
 				{
 					"index": 19,
 					"duration": 20
 				},
 				{
+					"index": 17,
+					"duration": 8
+				},
+				{
 					"index": 20,
 					"duration": 20
+				},
+				{
+					"index": 17,
+					"duration": 8
 				},
 				{
 					"index": 21,
