@@ -201,7 +201,7 @@ export default class Homework3_Scene extends Scene {
 		
 		// Set the player's position to the middle of the screen, and scale it down
 		this.player.position.set(this.viewport.getCenter().x, this.viewport.getCenter().y);
-		this.player.scale.set(0.4, 0.4);
+		this.player.scale.set(0.6, 0.6);
 
 		// Play the idle animation by default
 		this.player.animation.play("driving");
@@ -249,11 +249,11 @@ export default class Homework3_Scene extends Scene {
 			// HOMEWORK 3 - TODO
 			// Currently bullets use the base custom gradient circle shader, 
 			// you'll need to change this to the Linear Gradient Circle once you get that shader working. 
-			this.bullets[i].useCustomShader(Homework3Shaders.GRADIENT_CIRCLE);
+			this.bullets[i].useCustomShader(Homework3Shaders.LINEAR_GRADIENT_CIRCLE);
 
 			this.bullets[i].visible = false;
 			// This is the color each bullet is set to by default, you can change this if you like a different color
-			this.bullets[i].color = Color.BLUE;
+			this.bullets[i].color = Color.RED;
 
 			// Add AI to our bullet
 			this.bullets[i].addAI(BulletBehavior, {speed: 250});
@@ -307,8 +307,15 @@ export default class Homework3_Scene extends Scene {
 		if(bullet !== null){
 			// Spawn a bullet
 			bullet.visible = true;
+		
 			bullet.position = position.add(new Vec2(0, -64));
-			bullet.setAIActive(true, {speed: 250});
+			if(Math.floor(Math.random() * 2) == 1){
+				bullet.color = new Color(255, 53, 184, 1);
+				bullet.setAIActive(true, {speed: 250});
+			}else{
+				bullet.color = Color.YELLOW;
+				bullet.setAIActive(true, {speed: 500});
+			}
 		}
 	}
 
@@ -352,6 +359,7 @@ export default class Homework3_Scene extends Scene {
 			let event = this.receiver.getNextEvent();
 
 			if(event.type === Homework3Event.PLAYER_I_FRAMES_END){
+				console.log("no longer invinci"); 
 				this.playerinvincible = false;
 			}
 
@@ -478,7 +486,11 @@ export default class Homework3_Scene extends Scene {
 				// If the rock is spawned in and it overlaps the player
 				if(rock.visible && this.player.collisionShape.overlaps(rock.boundary)){
 					// Put your code here:
-					this.emitter.fireEvent(Homework3Event.PLAYER_DAMAGE);
+					this.playerHealth = this.playerHealth - 1;
+					this.healthLabel.text = `Health: ${this.playerHealth.toString()}`;
+					this.emitter.fireEvent(Homework3Event.PLAYER_DAMAGE, {health: this.playerHealth});
+					this.playerinvincible = true;
+					rock.visible = false;
 				}
 			}
 		}
@@ -571,12 +583,12 @@ export default class Homework3_Scene extends Scene {
 	handleScreenDespawn(node: CanvasNode, viewportCenter: Vec2, paddedViewportSize: Vec2, isBullet: boolean): void {
 		// Your code goes here:
 		if(isBullet){ // Is a bullet
-			if(node.boundary.bottom  < viewportCenter.y - (paddedViewportSize.y/2) - viewportCenter.y){
+			if(node.boundary.bottom  < viewportCenter.y - (paddedViewportSize.y/2)){
 				this.emitter.fireEvent(Homework3Event.BULLET_USED, {id: node.id});
-				console.log("imma let them bullets fly");
+				console.log("imma let them bullets fly, y: " + (viewportCenter.y - (paddedViewportSize.y/2)));
 			}
 		}
-		else{ // Is a rock
+		else{ // Is a rock- viewportCenter.y
 			if(node.boundary.top > viewportCenter.y + (paddedViewportSize.y/2)){
 				node.visible = false;
 				console.log("Rock despawned");
@@ -611,10 +623,28 @@ export default class Homework3_Scene extends Scene {
 	lockPlayer(viewportCenter: Vec2, viewportSize: Vec2): void {
 		//REMOVE
 		// Your code goes here:
-		if(this.player.positionY == (viewportCenter.y - viewportSize.y/2) + 1){
-			console.log("hit the top of the screen");
+		// if(this.player.boundary.topLeft.y <= (viewportCenter.y - viewportSize.y/2) + 1){
+		// 	this.player.position.y = (viewportCenter.y - viewportSize.y/2 + 1) + this.player.boundary.getHalfSize().y;
+		// 	console.log("hit the top of the screen");
+		// }
+		if(this.player.boundary.center.y - this.player.boundary.getHalfSize().y <= (viewportCenter.y - viewportSize.y/2) + 1){
+			this.player.position.y = (viewportCenter.y - viewportSize.y/2 + 1) + this.player.boundary.getHalfSize().y;
+			console.log("hit the top oxf the screen");
 		}
-
+		if(this.player.boundary.center.y + this.player.boundary.getHalfSize().y >= (viewportCenter.y + viewportSize.y/2) - 1){
+			this.player.position.y = (viewportCenter.y + viewportSize.y/2 - 1) - this.player.boundary.getHalfSize().y;
+			console.log("hit the bottom of the screen");
+		}
+		if(this.player.boundary.center.x - this.player.boundary.getHalfSize().x <= (viewportCenter.x - viewportSize.x/2) + 1){
+			this.player.position.x = (viewportCenter.x - viewportSize.x/2 + 1) + this.player.boundary.getHalfSize().x;
+			console.log("hit the left of the screen");
+		}
+		if(this.player.boundary.center.x + this.player.boundary.getHalfSize().x >= (viewportCenter.x + viewportSize.x/2) - 1){
+			this.player.position.x = (viewportCenter.x + viewportSize.x/2 - 1) - this.player.boundary.getHalfSize().x;
+			
+			console.log("hit the right of the screen");
+			console.log(this.player.position.x);
+		}	
 	}
 
 	// HOMEWORK 3 - TODO (2. collision)

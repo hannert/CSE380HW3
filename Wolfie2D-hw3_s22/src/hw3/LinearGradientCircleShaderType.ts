@@ -1,7 +1,5 @@
-import Map from "../Wolfie2D/DataTypes/Map";
 import Mat4x4 from "../Wolfie2D/DataTypes/Mat4x4";
 import Vec2 from "../Wolfie2D/DataTypes/Vec2";
-import Graphic from "../Wolfie2D/Nodes/Graphic";
 import Rect from "../Wolfie2D/Nodes/Graphics/Rect";
 import RectShaderType from "../Wolfie2D/Rendering/WebGLRendering/ShaderTypes/RectShaderType";
 import Color from "../Wolfie2D/Utils/Color";
@@ -76,12 +74,15 @@ export default class LinearGradientCircleShaderType extends RectShaderType {
 		gl.uniformMatrix4fv(u_Transform, false, transformation.toArray());
 
 		//color
-		let webGL_color = options.color.toWebGL();
-		const circle_Color = gl.getUniformLocation(program, "circle_Color");
-		gl.uniform4f(circle_Color, webGL_color[0], webGL_color[1], webGL_color[2], webGL_color[3]);
-
+		let bottomleftColor = options.color2.toWebGL();
+		let upperRightColor = options.color1.toWebGL();
+		const circle_ColorBottomLeftLocation = gl.getUniformLocation(program, "circle_ColorBottomLeft");
+		const circle_ColorUpperRightLocation = gl.getUniformLocation(program, "circle_ColorUpperRight");
+		
+		gl.uniform4f(circle_ColorBottomLeftLocation, bottomleftColor[0], bottomleftColor[1], bottomleftColor[2], bottomleftColor[3]);
+		gl.uniform4f(circle_ColorUpperRightLocation, upperRightColor[0], upperRightColor[1], upperRightColor[2], upperRightColor[3]) ;
 		// Draw the quad
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		gl.drawArrays(gl.TRIANGLE_STRIP , 0, 4);
 	}
 
 	// HOMEWORK 3 - TODO
@@ -96,7 +97,8 @@ export default class LinearGradientCircleShaderType extends RectShaderType {
 			position: gc.position,
 			size: gc.size,
 			rotation: gc.rotation,
-			color: gc.color,
+			color1: gc.color,
+			color2: Color.BLUE,
 		}
 		return options;
 	}

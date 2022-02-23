@@ -84,6 +84,7 @@ export default class CarPlayerController implements AI {
 			this.speed = this.MAX_SPEED;
 		} 
 		else { 
+			this.speed = this.MIN_SPEED;
 			if(Input.isKeyPressed("enter")){
 				this.emitter.fireEvent(Homework3Event.SHOOT_BULLET, {position: this.owner.position.clone()});  
 			}
