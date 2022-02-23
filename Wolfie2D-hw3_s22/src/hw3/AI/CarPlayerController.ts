@@ -99,10 +99,10 @@ export default class CarPlayerController implements AI {
 		this.owner.position.add(movement.scaled(deltaT));
 
 		// Animations
-		if(!this.owner.animation.isPlaying("takingDamage") && !this.owner.animation.isPlaying("dying") && !this.owner.animation.isPlaying("firing")){
+		if(!this.owner.animation.isPlaying("takingDamage") && !this.owner.animation.isPlaying("dying") && !this.owner.animation.isPlaying("firingWeapon")){
 			this.owner.animation.playIfNotAlready("driving");
 		}
-		if(Input.isKeyJustPressed("enter")){
+		if(Input.isMouseJustPressed()){
 			this.owner.animation.playIfNotAlready("firingWeapon");
 		}
 	}
